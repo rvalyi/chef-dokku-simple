@@ -1,24 +1,21 @@
+plugin_list_call = Chef::ShellOut.new('dokku', 'plugin', user: 'root')
+plugin_list_call.run_command
+plugin_list_call.error!
+plugin_list = plugin_list_call.stdout.split("\n").map { |line| line.split('  ').map(&:strip).reject(&:empty?).first }
+
 node[:dokku][:plugins].each do |name, url|
   target_dir = "/tmp/dokku-plugin-#{name}"
 
   if url.to_s == "remove"
-    bash 'dokku-plugin-uninstall' do
-      code "dokku plugin:uninstall #{name}"
+    if plugin_list.include?(name)
+      bash 'dokku-plugin-uninstall' do
+        code "dokku plugin:uninstall #{name}"
+      end
     end
   else
-    ## download requested plugin
-    (url, rev) = url.split("#", 2) if url.include?("#")
-    git target_dir do
-      repository url
-      revision rev if rev
-      action :sync
-      notifies :run, "bash[dokku-plugin-install-#{name}]"
+    ## install plugin
+    bash "dokku-plugin-install-#{name}" do
+      code "dokku plugin:#{plugin_list.include?(name) ? 'update' : 'install'} #{url}"
     end
-  end
-
-  ## install plugin
-  bash "dokku-plugin-install-#{name}" do
-    code "dokku plugin:update #{target_dir}"
-    action :nothing
   end
 end
