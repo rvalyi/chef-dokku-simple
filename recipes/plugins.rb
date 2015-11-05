@@ -4,8 +4,6 @@ plugin_list_call.error!
 plugin_list = plugin_list_call.stdout.split("\n").map { |line| line.split('  ').map(&:strip).reject(&:empty?).first }
 
 node[:dokku][:plugins].each do |name, url|
-  target_dir = "/tmp/dokku-plugin-#{name}"
-
   if url.to_s == "remove"
     if plugin_list.include?(name)
       bash 'dokku-plugin-uninstall' do
