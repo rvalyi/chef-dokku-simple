@@ -12,9 +12,11 @@ node[:dokku][:plugins].each do |name, url|
       only_if "dokku plugin | grep #{name}", user: "root"
     end
 
-    bash "dokku-plugin-update-#{name}" do
-      code "dokku plugin:update #{url}"
-      not_if "dokku plugin | grep #{name}", user: "root"
-    end
+    # Disable plugin update as updating plugins is currently broken in plugn itself
+    # See: https://github.com/progrium/dokku/issues/1531
+    # bash "dokku-plugin-update-#{name}" do
+    #   code "dokku plugin:update #{url}"
+    #   not_if "dokku plugin | grep #{name}", user: "root"
+    # end
   end
 end
