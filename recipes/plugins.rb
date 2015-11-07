@@ -1,10 +1,9 @@
 node[:dokku][:plugins].each do |name, url|
   if url.to_s == "remove"
-    if plugin_list.include?(name)
-      bash 'dokku-plugin-uninstall' do
-        user 'root'
-        code "dokku plugin:uninstall #{name}"
-      end
+    bash 'dokku-plugin-uninstall' do
+      user 'root'
+      code "dokku plugin:uninstall #{name}"
+      only_if "dokku plugin | grep #{name}", user: "root"
     end
   else
     ## install plugin
