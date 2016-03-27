@@ -7,12 +7,13 @@ node[:dokku][:ssh_users].each do |user|
     bash 'sshcommand-acl-add' do
       cwd node[:dokku][:root]
       code "echo '#{key}' | sshcommand acl-add dokku #{user}-#{index}"
-      not_if do
-        authed_keys  = File.exist?(authed_file) && File.read(authed_file)
-        escaped_name = Regexp.escape("#{user}-#{index}")
-        escaped_key  = Regexp.escape(key)
+      not_if "grep '\\\\\"#{user}-#{index}\\\\\"' /#{node[:dokku][:root]}/.ssh/authorized_keys"
+#      not_if do
+#        authed_keys  = File.exist?(authed_file) && File.read(authed_file)
+#        escaped_name = Regexp.escape("#{user}-#{index}")
+#        escaped_key  = Regexp.escape(key)
 
-        authed_keys && authed_keys =~ /^.+#{escaped_name}.+#{escaped_key}.*$/
+#        authed_keys && authed_keys =~ /^.+#{escaped_name}.+#{escaped_key}.*$/
       end
     end
   end
