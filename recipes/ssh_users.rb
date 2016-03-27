@@ -14,7 +14,7 @@ node[:dokku][:ssh_users].each do |user|
 #        escaped_key  = Regexp.escape(key)
 
 #        authed_keys && authed_keys =~ /^.+#{escaped_name}.+#{escaped_key}.*$/
-      end
+#      end
     end
   end
 end
